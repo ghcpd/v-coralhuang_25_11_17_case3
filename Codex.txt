@@ -1,0 +1,263 @@
+You are a backend, DevOps, and test engineer working in a real execution environment. You are given a buggy reference module saved as input.py, which implements a Flask blueprint with SQLAlchemy, Redis, and Celery usage. The file is intentionally flawed in logic, error handling, caching, async tasks, configuration, and security. Treat input.py as read-only. Do not overwrite or modify any existing files. All fixes must be placed in new files, preferably under a fixes/ directory. Your tasks: Implement a corrected, production-grade version of the module (e.g., fixes/user_module_fixed.py) preserving functionality but resolving all issues found in input.py. Provide a fully reproducible environment including one-command setup, one-command test execution, Docker support, and complete documentation. All tests must be executable, non-interactive, and produce real, verifiable output. The fixed implementation must expose: GET /v1/user/profile: Validate Authorization header, parse user_id from token (strict format), check Redis cache, load from DB on miss, enforce soft-delete and is_active checks, serialize to JSON, store in Redis with a correct 5-minute TTL, and return structured JSON success response. POST /v1/user/avatar: Validate token, accept uploaded file, simulate cloud storage upload without real network calls, update user avatar in DB using proper transactions, update Redis cache, dispatch a Celery task to record avatar changes, and return a structured success response. The fixed implementation must not contain: Hardcoded Redis/Celery configuration Raw SQL injection risks Unhandled exceptions or swallowed errors Global state initialized at import time You may introduce new helper modules under fixes/ for configuration loading, error modeling, DB initialization, Redis client factory, Celery factory, token parsing utilities, etc., but may not alter the original input.py. Issues that must be addressed: Token parsing: strict validation, proper error messages, correct HTTP codes. Serialization: no returning raw bytes, consistent JSON structures, proper load/dump. Caching: correct TTL units, consistent cache schema, graceful degradation on Redis failures. DB access: safe transactions, no raw SQL with interpolation, correct session usage. Soft-delete status: enforce delete_time/is_active checks for all reads and writes. Celery: eager mode for tests, correct app context handling, robust error handling. Config: environment-based configuration, no hardcoded endpoints or credentials. Flask integration: blueprint-based design, no global app instance, clean error handling. Logging and errors: clear, structured errors for all failure scenarios. Required outputs under fixes/: Implementation: A corrected module (e.g., fixes/user_module_fixed.py) plus any needed support modules (fixes/config.py, fixes/db.py, fixes/error.py, etc.). Test suite using pytest: covers success and failure paths for both endpoints, including Redis failures and Celery task errors; uses Celery eager mode. Environment: fixes/requirements.txt with all dependencies. fixes/README.md documenting environment setup, running tests, Docker usage. Scripts: fixes/setup.sh: create venv, install dependencies. fixes/run_test.sh: activate venv and run tests. fixes/run_test.bat: Windows equivalent. Optional cleanup script. Docker assets: fixes/Dockerfile or similar. fixes/run_in_docker.sh to build and run tests inside container. Optional docker-compose for Redis. Artifacts: A fixes/artifacts/ directory for test logs and generated files. CHANGES.md summarizing major modifications, limitations, and how to integrate the fixed module. Execution requirements: Tests must be real, repeatable, and runnable locally and in Docker. Success responses must follow { "error_code": int, "msg": string, "data": object }. Error responses must follow { "error_code": int, "msg": string, "request_url": string }. Redis cache behavior must be verifiable through tests. Celery tasks must be fully testable in eager mode. All scripts must exit 0 on success and non-zero on failure. Re-running the whole environment multiple times must yield consistent results. Deliver a complete, testable, reproducible fixed module and environment without altering the original input.py.
+
+
+
+You are a backend, DevOps, and test engineer working in a real execution environment. You are given a buggy reference module saved as input.py, which implements a Flask blueprint with SQLAlchemy, Redis, and Celery usage. The file is intentionally flawed in logic, error handling, caching, async tasks, configuration, and security. Treat input.py as read-only. Do not overwrite or modify any existing files. All fixes must be placed in new files, preferably under a fixes/ directory.
+Your tasks:
+
+Implement a corrected, production-grade version of the module (e.g., fixes/user_module_fixed.py) preserving functionality but resolving all issues found in input.py.
+
+Provide a fully reproducible environment including one-command setup, one-command test execution, Docker support, and complete documentation.
+
+All tests must be executable, non-interactive, and produce real, verifiable output.
+The fixed implementation must expose:
+
+GET /v1/user/profile: Validate Authorization header, parse user_id from token (strict format), check Redis cache, load from DB on miss, enforce soft-delete and is_active checks, serialize to JSON, store in Redis with a correct 5-minute TTL, and return structured JSON success response.
+
+POST /v1/user/avatar: Validate token, accept uploaded file, simulate cloud storage upload without real network calls, update user avatar in DB using proper transactions, update Redis cache, dispatch a Celery task to record avatar changes, and return a structured success response.
+The fixed implementation must not contain:
+
+Hardcoded Redis/Celery configuration
+
+Raw SQL injection risks
+
+Unhandled exceptions or swallowed errors
+
+Global state initialized at import time
+You may introduce new helper modules under fixes/ for configuration loading, error modeling, DB initialization, Redis client factory, Celery factory, token parsing utilities, etc., but may not alter the original input.py.
+
+Issues that must be addressed:
+
+Token parsing: strict validation, proper error messages, correct HTTP codes.
+
+Serialization: no returning raw bytes, consistent JSON structures, proper load/dump.
+
+Caching: correct TTL units, consistent cache schema, graceful degradation on Redis failures.
+
+DB access: safe transactions, no raw SQL with interpolation, correct session usage.
+
+Soft-delete status: enforce delete_time/is_active checks for all reads and writes.
+
+Celery: eager mode for tests, correct app context handling, robust error handling.
+
+Config: environment-based configuration, no hardcoded endpoints or credentials.
+
+Flask integration: blueprint-based design, no global app instance, clean error handling.
+
+Logging and errors: clear, structured errors for all failure scenarios.
+
+Required outputs under fixes/:
+
+Implementation: A corrected module (e.g., fixes/user_module_fixed.py) plus any needed support modules (fixes/config.py, fixes/db.py, fixes/error.py, etc.).
+
+Test suite using pytest: covers success and failure paths for both endpoints, including Redis failures and Celery task errors; uses Celery eager mode.
+
+Environment:
+
+fixes/requirements.txt with all dependencies.
+
+fixes/README.md documenting environment setup, running tests, Docker usage.
+
+Scripts:
+
+fixes/setup.sh: create venv, install dependencies.
+
+fixes/run_test.sh: activate venv and run tests.
+
+fixes/run_test.bat: Windows equivalent.
+
+Optional cleanup script.
+
+Docker assets:
+
+fixes/Dockerfile or similar.
+
+fixes/run_in_docker.sh to build and run tests inside container.
+
+Optional docker-compose for Redis.
+
+Artifacts: A fixes/artifacts/ directory for test logs and generated files.
+
+CHANGES.md summarizing major modifications, limitations, and how to integrate the fixed module.
+
+Execution requirements:
+
+Tests must be real, repeatable, and runnable locally and in Docker.
+
+Success responses must follow { "error_code": int, "msg": string, "data": object }.
+
+Error responses must follow { "error_code": int, "msg": string, "request_url": string }.
+
+Redis cache behavior must be verifiable through tests.
+
+Celery tasks must be fully testable in eager mode.
+
+All scripts must exit 0 on success and non-zero on failure.
+
+Re-running the whole environment multiple times must yield consistent results.
+
+Deliver a complete, testable, reproducible fixed module and environment without altering the original input.py.
+
+
+Implementation
+
+Replaced the buggy blueprint with fixes/user_module_fixed.py (lines 23-149), which now enforces strict Bearer tokens, sanitizes payloads, applies soft-delete/is_active checks, keeps Redis interactions resilient with a 5-minute TTL, and wraps DB writes plus Celery dispatching in safe helpers.
+Added configuration, factory, and persistence layers (fixes/config.py (lines 10-56), fixes/app_factory.py (lines 7-46), fixes/extensions.py (line 4), fixes/models.py (lines 12-53)) so an app can be assembled without global state; the factory wires SQLAlchemy, fakeredis/real Redis, Celery eager mode, and guarantees storage/artifact directories exist.
+Introduced hardened infrastructure helpers—structured responses and error handlers (fixes/errors.py (lines 1-60)), strict token parsing (fixes/token_utils.py (lines 5-24)), Redis utilities (fixes/redis_utils.py (lines 3-45)), deterministic “cloud” uploads (fixes/storage.py (lines 8-44)), transactional DB scope (fixes/db_utils.py (lines 1-17)), and Celery logging tasks with retries (fixes/tasks.py (lines 11-42)).
+Delivered end-to-end pytest coverage (fixes/tests/test_user_module.py (lines 1-157) plus fixes/tests/conftest.py (lines 1-47)) spanning cache hits/misses, inactive/soft-deleted users, Redis outages, avatar uploads, and Celery error handling; fixtures build isolated apps with fakeredis and sqlite.
+Documented the workflow in fixes/README.md, summarized in CHANGES.md, and provided portable tooling: requirements, setup/test scripts (fixes/setup.sh, fixes/run_test.sh, fixes/run_test.bat, fixes/cleanup.sh), Docker assets (fixes/Dockerfile, fixes/run_in_docker.sh), and a reusable namespace package initializer fixes/__init__.py.
+Test logs now land under fixes/artifacts/test.log, and fixes/run_test.sh exports PYTHONPATH/TMPDIR so pytest runs reliably on this filesystem layout.
+Testing
+
+bash fixes/run_test.sh (writes results to fixes/artifacts/test.log): 11 passed, 4 warnings in 1.02s.
+Next Steps
+
+Run bash fixes/run_in_docker.sh to confirm the Dockerized workflow on your machine/CI.
+Integrate the blueprint by importing fixes.user_module_fixed.user_bp, wiring the helpers as shown in fixes/app_factory.py, and point Celery/Redis configs at your production services.
+24 files changed
++1046
+-0
+
+Undo
+
+View all changes
+CHANGES.md
++20
+-0
+
+Dockerfile
++13
+-0
+
+README.md
++71
+-0
+
+__init__.py
++2
+-0
+
+app_factory.py
++51
+-0
+
+celery_utils.py
++30
+-0
+
+"""Celery factory helpers."""
+
+from __future__ import annotations
+
+from celery import Celery
+
+from .config import AppConfig
+
+
+def make_celery(flask_app, config: AppConfig) -> Celery:
+    """Create a Celery app bound to the provided Flask application."""
+    celery_app = Celery(
+        flask_app.import_name,
+        broker=config.celery_broker_url,
+        backend=config.celery_result_backend,
+    )
+    celery_app.conf.update(
+        task_always_eager=config.celery_task_always_eager,
+        task_eager_propagates=True,
+        timezone="UTC",
+    )
+
+    class ContextTask(celery_app.Task):
+        def __call__(self, *args, **kwargs):
+            with flask_app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery_app.Task = ContextTask
+    return celery_app
+
+cleanup.sh
++13
+-0
+
+config.py
++69
+-0
+
+db_utils.py
++22
+-0
+
+errors.py
++73
+-0
+
+extensions.py
++7
+-0
+
+models.py
++58
+-0
+
+redis_utils.py
++48
+-0
+
+requirements.txt
++8
+-0
+
+run_in_docker.sh
++9
+-0
+
+run_test.bat
++28
+-0
+
+run_test.sh
++28
+-0
+
+setup.sh
++16
+-0
+
+storage.py
++41
+-0
+
+tasks.py
++44
+-0
+
+conftest.py
++61
+-0
+
+test_user_module.py
++153
+-0
+
+token_utils.py
++32
+-0
+
+user_module_fixed.py
++149
+-0
+
+
+
+
+
+Auto context
+
+
+Local
+
+Agent (full access)
+
+GPT-5-Codex
+
+Medium
