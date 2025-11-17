@@ -1,0 +1,64 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.4.2, pluggy-1.6.0
+rootdir: /mnt/c/Bug_Bash/25_11_17/v-coralhuang_25_11_17_case3
+collected 8 items
+
+fixes/tests/test_user_module.py::test_get_profile_success_populates_cache PASSED
+fixes/tests/test_user_module.py::test_get_profile_missing_authorization PASSED
+fixes/tests/test_user_module.py::test_get_profile_user_not_found PASSED
+fixes/tests/test_user_module.py::test_get_profile_soft_deleted PASSED
+fixes/tests/test_user_module.py::test_avatar_upload_success 
+-------------------------------- live log call ---------------------------------
+WARNING  kombu.connection:connection.py:669 No hostname was supplied. Reverting to default 'localhost'
+INFO     fixes.tasks:tasks.py:20 Recording avatar change for user 3
+INFO     celery.app.trace:trace.py:128 Task fixes.tasks.log_avatar_change[71250cfa-594f-4f29-b9a0-212915c63900] succeeded in 0.028008092998788925s: None
+PASSED
+fixes/tests/test_user_module.py::test_avatar_upload_missing_file PASSED
+fixes/tests/test_user_module.py::test_avatar_upload_handles_celery_failure 
+-------------------------------- live log call ---------------------------------
+ERROR    test_user_module:user_module_fixed.py:116 Celery task failed for avatar change
+Traceback (most recent call last):
+  File "/mnt/c/Bug_Bash/25_11_17/v-coralhuang_25_11_17_case3/fixes/user_module_fixed.py", line 114, in upload_avatar
+    log_avatar_change.delay(user_id, avatar_url, changed_at)
+  File "/usr/lib/python3.12/unittest/mock.py", line 1134, in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/unittest/mock.py", line 1138, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/unittest/mock.py", line 1193, in _execute_mock_call
+    raise effect
+RuntimeError: boom
+PASSED
+fixes/tests/test_user_module.py::test_profile_survives_cache_errors 
+-------------------------------- live log call ---------------------------------
+ERROR    root:cache.py:20 Redis GET failed for key user_profile:5
+Traceback (most recent call last):
+  File "/mnt/c/Bug_Bash/25_11_17/v-coralhuang_25_11_17_case3/fixes/cache.py", line 18, in get
+    return self._client.get(key)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Bug_Bash/25_11_17/v-coralhuang_25_11_17_case3/fixes/tests/test_user_module.py", line 52, in get
+    raise RuntimeError("redis GET failure")
+RuntimeError: redis GET failure
+ERROR    root:cache.py:27 Redis SETEX failed for key user_profile:5
+Traceback (most recent call last):
+  File "/mnt/c/Bug_Bash/25_11_17/v-coralhuang_25_11_17_case3/fixes/cache.py", line 25, in setex
+    self._client.setex(key, ttl, value)
+  File "/mnt/c/Bug_Bash/25_11_17/v-coralhuang_25_11_17_case3/fixes/tests/test_user_module.py", line 55, in setex
+    raise RuntimeError("redis SET failure")
+RuntimeError: redis SET failure
+PASSED
+
+=============================== warnings summary ===============================
+fixes/tests/test_user_module.py::test_get_profile_soft_deleted
+  /mnt/c/Bug_Bash/25_11_17/v-coralhuang_25_11_17_case3/fixes/tests/test_user_module.py:84: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    _create_user(database, user_id=2, deleted_at=datetime.utcnow())
+
+fixes/tests/test_user_module.py::test_avatar_upload_success
+fixes/tests/test_user_module.py::test_avatar_upload_handles_celery_failure
+  /mnt/c/Bug_Bash/25_11_17/v-coralhuang_25_11_17_case3/fixes/user_module_fixed.py:96: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    changed_at = datetime.utcnow().isoformat()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /mnt/c/Bug_Bash/25_11_17/v-coralhuang_25_11_17_case3/fixes/artifacts/pytest.xml -
+======================== 8 passed, 3 warnings in 0.32s =========================
