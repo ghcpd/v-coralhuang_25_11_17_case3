@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  app_tests:
+    build: .
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - ENV=testing
+      - CELERY_EAGER=true
+      - DATABASE_URL=sqlite:///:memory:
+    volumes:
+      - ./artifacts:/app/artifacts
+    command: python -m pytest test_user_module.py -v --tb=short --color=yes --junit-xml=artifacts/test_results.xml
+
+volumes:
+  redis_data:
