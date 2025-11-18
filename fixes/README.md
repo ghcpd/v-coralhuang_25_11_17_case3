@@ -22,3 +22,8 @@ Setup (Windows):
 Docker:
 - ./run_in_docker.sh will build and run tests inside Docker.
 
+Integration (compose):
+- To run integration-style tests against a real Redis instance using docker-compose (recommended for CI), run:
+  - ./run_in_docker.sh compose
+  - This will start a local `redis` service and run all tests inside a container that connects to it.
+

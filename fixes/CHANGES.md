@@ -20,3 +20,7 @@ How to integrate:
 - Register `user_bp` blueprint from `fixes.user_module_fixed` in your Flask application
 - Provide `DATABASE_URL`, `REDIS_URL`, `CELERY_BROKER_URL`, `SECRET_KEY` through environment
 
+Integration tests:
+- `fixes/docker-compose.yml` contains a `redis` service and a `pytest` service that runs tests against the real Redis instance
+- Use `./run_in_docker.sh compose` to run integration-style tests
+

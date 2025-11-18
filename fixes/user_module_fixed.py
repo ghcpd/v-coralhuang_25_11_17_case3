@@ -12,7 +12,7 @@ from sqlalchemy.orm import scoped_session
 from .config import config, generate_hmac_signature
 from .errors import Success, NotFound, ServerError, Unauthorized, BadRequest
 from .db import EntityModel, init_db, get_session
-from .redis_client import get_redis_client
+from . import redis_client
 from .celery_app import celery_app
 
 
@@ -26,9 +26,9 @@ from sqlalchemy import Column, String
 class User(EntityModel):
     __tablename__ = "user"
 
-    nickname = Column(String(50), unique=True, nullable=False)
+    nickname = Column(String(50), nullable=False)
     avatar = Column(String(255))
-    email = Column(String(120), unique=True)
+    email = Column(String(120))
 
 
 # Avatar log model
@@ -84,7 +84,7 @@ def get_profile_flask():
         user_id = parse_token_strict(auth)
 
         cache_key = _get_user_cache_key(user_id)
-        redis = get_redis_client()
+        redis = redis_client.get_redis_client()
 
         try:
             cached = redis.get(cache_key)
@@ -148,7 +148,7 @@ def upload_avatar_flask():
             session.add(user)
             session.commit()
             # Update Redis cache
-            redis = get_redis_client()
+            redis = redis_client.get_redis_client()
             try:
                 user_data = user.to_dict()
                 redis.setex(_get_user_cache_key(user_id), config.USER_PROFILE_CACHE_TTL, json.dumps(user_data))

@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  pytest:
+    build:
+      context: ..
+      dockerfile: fixes/Dockerfile
+    depends_on:
+      - redis
+    environment:
+      - FLASK_ENV=test
+      - CELERY_TASK_ALWAYS_EAGER=true
+      - SECRET_KEY=test-secret
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ..:/app:cached
+    working_dir: /app/fixes
+    command: ["pytest", "-q"]
+    restart: "no"
