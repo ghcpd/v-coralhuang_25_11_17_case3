@@ -1,0 +1,7 @@
+Flask>=2.0
+SQLAlchemy>=1.4
+redis>=4.5
+celery>=5.2
+pytest>=7.0
+fakeredis>=1.7
+requests>=2.28

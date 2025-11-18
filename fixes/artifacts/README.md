@@ -1,0 +1,1 @@
+Artifacts directory to collect test logs and outputs.
