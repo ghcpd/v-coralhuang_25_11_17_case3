@@ -1,0 +1,95 @@
+You are a backend, DevOps, and test engineer working in a real execution environment. You are given a buggy reference module saved as input.py, which implements a Flask blueprint with SQLAlchemy, Redis, and Celery usage. The file is intentionally flawed in logic, error handling, caching, async tasks, configuration, and security. Treat input.py as read-only. Do not overwrite or modify any existing files. All fixes must be placed in new files, preferably under a fixes/ directory.
+Your tasks:
+
+Implement a corrected, production-grade version of the module (e.g., fixes/user_module_fixed.py) preserving functionality but resolving all issues found in input.py.
+
+Provide a fully reproducible environment including one-command setup, one-command test execution, Docker support, and complete documentation.
+
+All tests must be executable, non-interactive, and produce real, verifiable output.
+The fixed implementation must expose:
+
+GET /v1/user/profile: Validate Authorization header, parse user_id from token (strict format), check Redis cache, load from DB on miss, enforce soft-delete and is_active checks, serialize to JSON, store in Redis with a correct 5-minute TTL, and return structured JSON success response.
+
+POST /v1/user/avatar: Validate token, accept uploaded file, simulate cloud storage upload without real network calls, update user avatar in DB using proper transactions, update Redis cache, dispatch a Celery task to record avatar changes, and return a structured success response.
+The fixed implementation must not contain:
+
+Hardcoded Redis/Celery configuration
+
+Raw SQL injection risks
+
+Unhandled exceptions or swallowed errors
+
+Global state initialized at import time
+You may introduce new helper modules under fixes/ for configuration loading, error modeling, DB initialization, Redis client factory, Celery factory, token parsing utilities, etc., but may not alter the original input.py.
+
+Issues that must be addressed:
+
+Token parsing: strict validation, proper error messages, correct HTTP codes.
+
+Serialization: no returning raw bytes, consistent JSON structures, proper load/dump.
+
+Caching: correct TTL units, consistent cache schema, graceful degradation on Redis failures.
+
+DB access: safe transactions, no raw SQL with interpolation, correct session usage.
+
+Soft-delete status: enforce delete_time/is_active checks for all reads and writes.
+
+Celery: eager mode for tests, correct app context handling, robust error handling.
+
+Config: environment-based configuration, no hardcoded endpoints or credentials.
+
+Flask integration: blueprint-based design, no global app instance, clean error handling.
+
+Logging and errors: clear, structured errors for all failure scenarios.
+
+Required outputs under fixes/:
+
+Implementation: A corrected module (e.g., fixes/user_module_fixed.py) plus any needed support modules (fixes/config.py, fixes/db.py, fixes/error.py, etc.).
+
+Test suite using pytest: covers success and failure paths for both endpoints, including Redis failures and Celery task errors; uses Celery eager mode.
+
+Environment:
+
+fixes/requirements.txt with all dependencies.
+
+fixes/README.md documenting environment setup, running tests, Docker usage.
+
+Scripts:
+
+fixes/setup.sh: create venv, install dependencies.
+
+fixes/run_test.sh: activate venv and run tests.
+
+fixes/run_test.bat: Windows equivalent.
+
+Optional cleanup script.
+
+Docker assets:
+
+fixes/Dockerfile or similar.
+
+fixes/run_in_docker.sh to build and run tests inside container.
+
+Optional docker-compose for Redis.
+
+Artifacts: A fixes/artifacts/ directory for test logs and generated files.
+
+CHANGES.md summarizing major modifications, limitations, and how to integrate the fixed module.
+
+Execution requirements:
+
+Tests must be real, repeatable, and runnable locally and in Docker.
+
+Success responses must follow { "error_code": int, "msg": string, "data": object }.
+
+Error responses must follow { "error_code": int, "msg": string, "request_url": string }.
+
+Redis cache behavior must be verifiable through tests.
+
+Celery tasks must be fully testable in eager mode.
+
+All scripts must exit 0 on success and non-zero on failure.
+
+Re-running the whole environment multiple times must yield consistent results.
+
+Deliver a complete, testable, reproducible fixed module and environment without altering the original input.py.
